@@ -1,0 +1,65 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Khoa's Football</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #101827;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+
+    .container {
+      text-align: center;
+      padding: 32px;
+      background: #1e293b;
+      border-radius: 16px;
+      width: min(420px, 85%);
+    }
+
+    h1 {
+      margin-bottom: 10px;
+    }
+
+    p {
+      color: #cbd5e1;
+      line-height: 1.6;
+    }
+
+    a {
+      display: inline-block;
+      margin-top: 16px;
+      padding: 12px 22px;
+      border-radius: 8px;
+      background: #22c55e;
+      color: #07130a;
+      text-decoration: none;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <h1>⚽ Khoa's Football</h1>
+    <p>Phòng HaxBall của chúng ta</p>
+    <p>Space: Kick · Shift: Pass (đang phát triển)</p>
+    <a href="#" id="roomLink">Mở phòng HaxBall</a>
+  </main>
+
+  <script>
+    const ROOM_URL = "https://www.haxball.com/play?c=KBn9m-B9xtQ";
+
+    document.getElementById("roomLink").href = ROOM_URL;
+    document.getElementById("roomLink").target = "_blank";
+    document.getElementById("roomLink").rel = "noopener noreferrer";
+  </script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+{
+  "name": "haxball-headlessv2.0",
+  "version": "1.0.0",
+  "description": "mmb",
+  "main": "index.js",
+  "scripts": {
+    "dev": "tsx src/main.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/khoa28e37/haxball-headlessv2.0.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/khoa28e37/haxball-headlessv2.0/issues"
+  },
+  "homepage": "https://github.com/khoa28e37/haxball-headlessv2.0#readme",
+  "dependencies": {
+    "express": "^5.3.0",
+    "haxball.js": "^5.1.0",
+    "ws": "^8.22.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.6.5",
+    "@types/ws": "^8.18.2",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  }
+}
