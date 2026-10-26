@@ -1,11 +1,14 @@
 
 const BALL_DISC_ID = 0;
 const MIN_SHOT_SPEED = 3.5;
-const MAX_SHOT_SPEED = 10;
-const MAX_HOLD_TIME = 1000;
+const MAX_SHOT_SPEED = 13;
+const MAX_HOLD_TIME = 2000;
 const EXTRA_RANGE = 10;
 
-export function registerShotPower(room: any) {
+export function registerShotPower(
+  room: any,
+  onShot?: (player: any) => void
+) {
   const holdStart = new Map<number, number>();
   const kickFlag = room.InputFlags.kick;
   const collisionKickFlag = room.CollisionFlags.kick;
@@ -100,6 +103,7 @@ room.onPositionsReset = () => {
         xspeed: (dx / distance) * shotSpeed,
         yspeed: (dy / distance) * shotSpeed,
       });
+      onShot?.(player);
 
       console.log(`[SHOT] Áp dụng vận tốc: ${shotSpeed.toFixed(2)}`);
     }
