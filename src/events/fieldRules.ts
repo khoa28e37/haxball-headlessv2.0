@@ -10,6 +10,7 @@ const GOAL_HALF_WIDTH = 115;
 const TOUCHLINE_BARRIER_Y = 500;
 const CORNER_HALF_SIZE = 55;
 const CORNER_OFFSET = 55;
+const RESTART_TIMEOUT_MS = 15_000;
 
 export function registerRsEliteFieldRules(room: any) {
   let lastTouchTeam: Team | null = null;
@@ -17,6 +18,16 @@ export function registerRsEliteFieldRules(room: any) {
   let restartTeam: Team | null = null;
   let previousPosition: { x: number; y: number } | null = null;
   let originalBallCGroup: number | null = null;
+  let restartTimeout: ReturnType<typeof setTimeout> | null = null;
+  let restartBarrierType: BarrierType = "none";
+  let restartPosition: { x: number; y: number } | null = null;
+
+  function clearRestartTimeout() {
+    if (restartTimeout !== null) {
+      clearTimeout(restartTimeout);
+      restartTimeout = null;
+    }
+  }
 
   // Lưu nhóm va chạm gốc của người chơi để khôi phục chính xác.
   const originalGroups = new Map<number, number>();
@@ -144,6 +155,7 @@ export function registerRsEliteFieldRules(room: any) {
     message: string,
     barrierType: BarrierType = "none",
   ) {
+    clearRestartTimeout();
     restoreBlockedTeam();
     restoreGoalScoring();
 
@@ -156,6 +168,8 @@ export function registerRsEliteFieldRules(room: any) {
 
     restartActive = true;
     restartTeam = awardedTeam;
+    restartBarrierType = barrierType;
+    restartPosition = { x, y };
     lastTouchTeam = null;
     previousPosition = { x, y };
 
@@ -179,6 +193,54 @@ export function registerRsEliteFieldRules(room: any) {
 
     room.sendAnnouncement(message);
     console.log(`[FIELD] ${message}`);
+
+    if (barrierType === "throw-in" || barrierType === "corner") {
+      const expectedTeam = awardedTeam;
+      const expectedType = barrierType;
+      const expectedPosition = { x, y };
+
+      room.sendAnnouncement(
+        `⏱️ Đội ${teamName(awardedTeam)} có 15 giây để thực hiện tình huống!`,
+      );
+
+      restartTimeout = setTimeout(() => {
+        restartTimeout = null;
+
+        if (
+          !restartActive ||
+          restartTeam !== expectedTeam ||
+          restartBarrierType !== expectedType ||
+          restartPosition?.x !== expectedPosition.x ||
+          restartPosition?.y !== expectedPosition.y
+        ) return;
+
+        const opponent = otherTeam(expectedTeam);
+
+        if (expectedType === "throw-in") {
+          room.sendAnnouncement(
+            `⌛ Hết 15 giây! Quyền đá biên chuyển cho đội ${teamName(opponent)}.`,
+          );
+          restartBall(
+            expectedPosition.x,
+            expectedPosition.y,
+            opponent,
+            `📣 Đá biên cho đội ${teamName(opponent)}!`,
+            "throw-in",
+          );
+        } else {
+          room.sendAnnouncement(
+            `⌛ Hết 15 giây! Đội ${teamName(opponent)} được phát bóng lên.`,
+          );
+          restartBall(
+            Math.sign(expectedPosition.x) * (HALF_LENGTH - 200),
+            0,
+            opponent,
+            `🧤 Phát bóng lên cho đội ${teamName(opponent)}!`,
+            "goal-kick",
+          );
+        }
+      }, RESTART_TIMEOUT_MS);
+    }
   }
 
   function recordTouch(player: any) {
@@ -187,11 +249,14 @@ export function registerRsEliteFieldRules(room: any) {
     lastTouchTeam = player.team;
 
     if (restartActive && restartTeam === player.team) {
+      clearRestartTimeout();
       restoreBlockedTeam();
       restoreGoalScoring();
 
       restartActive = false;
       restartTeam = null;
+      restartBarrierType = "none";
+      restartPosition = null;
 
       console.log(
         "[FIELD] Đội được hưởng đã chạm bóng; vạch chắn và khóa ghi bàn đã được gỡ.",
@@ -204,12 +269,15 @@ export function registerRsEliteFieldRules(room: any) {
   room.onPositionsReset = () => {
     previousPositionsReset?.();
 
+    clearRestartTimeout();
     restoreBlockedTeam();
     restoreGoalScoring();
 
     lastTouchTeam = null;
     restartActive = false;
     restartTeam = null;
+    restartBarrierType = "none";
+    restartPosition = null;
     previousPosition = null;
   };
 
