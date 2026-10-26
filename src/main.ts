@@ -1,3 +1,4 @@
+
 import { createInterface } from "node:readline/promises";
 import { stdin, stdout } from "node:process";
 import { loadRandomMap } from "../maps/mapManager.js";
@@ -32,13 +33,15 @@ async function main() {
 
   registerAutoAdmin(room);
   registerPlayerChat(room);
-  registerShotPower(room);
+
   if (selectedMap.toLowerCase().includes("rs-elite")) {
     const recordShotTouch = registerRsEliteFieldRules(room);
 
     registerShotPower(room, recordShotTouch);
 
-    console.log("[FIELD] Đã bật luật đá biên và phạt góc cho RS ELITE.");
+    console.log(
+      "[FIELD] Đã bật luật đá biên và phạt góc cho RS ELITE."
+    );
   } else {
     registerShotPower(room);
   }
