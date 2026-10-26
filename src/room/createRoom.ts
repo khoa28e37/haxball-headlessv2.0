@@ -9,7 +9,7 @@ export function createRoom(token: string) {
       roomName: config.roomName,
       maxPlayers: config.maxPlayers,
       public: config.public,
-      password: config.password,
+      ...(config.password ? { password: config.password } : {}),
       noPlayer: config.noPlayer,
       token,
     });
